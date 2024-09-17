@@ -1,7 +1,7 @@
 /**
  * Хранилище состояния приложения
  */
-class Store {
+ class Store {
   constructor(initState = {}) {
     this.state = initState;
     this.listeners = []; // Слушатели изменений состояния
@@ -42,12 +42,17 @@ class Store {
    * Добавление новой записи
    */
   addItem() {
+    let id = 0;
+    this.state.list.forEach(element => {
+      if (element.code > id) {
+        id = element.code;
+      }
+    });
     this.setState({
       ...this.state,
-      list: [...this.state.list, { code: this.state.list.length + 1, title: 'Новая запись' }],
+      list: [...this.state.list, { code: id + 1, title: 'Новая запись', click: 0}],
     });
   }
-
   /**
    * Удаление записи по коду
    * @param code
@@ -63,12 +68,24 @@ class Store {
    * Выделение записи по коду
    * @param code
    */
+
   selectItem(code) {
     this.setState({
       ...this.state,
       list: this.state.list.map(item => {
         if (item.code === code) {
-          item.selected = !item.selected;
+          if (item.selected == 0) {
+            this.state.list.forEach(element => {
+              element.selected = 0;
+            });
+            item.selected = 1;
+            item.click++
+          }else{
+            this.state.list.forEach(element => {
+              element.selected = 0;
+            });
+            item.selected = 0;
+          }
         }
         return item;
       }),
